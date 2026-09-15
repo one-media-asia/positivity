@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A 1-hour positive reinforcement app that supports your mindset with affirmations, encouragement, and a calm countdown."
+    />
+    <title>Glow Hour</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="glow glow-one"></div>
+      <div class="glow glow-two"></div>
+
+      <main class="session-app">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">1-HOUR RESET</p>
+            <h1>Glow Hour</h1>
+          </div>
+          <div class="name-field" aria-label="Your name">
+            <label for="userName">For</label>
+            <input id="userName" type="text" value="you" maxlength="20" />
+          </div>
+          <div class="actions">
+            <button id="startBtn" class="primary-button">Start now</button>
+            <button id="resetBtn" class="secondary-button">Reset</button>
+            <button id="voiceToggle" class="secondary-button" type="button">Vocal on</button>
+            <button id="ambientToggle" class="secondary-button" type="button">Atmosphere off</button>
+          </div>
+        </header>
+
+        <section class="timer-card card">
+          <div class="status-row">
+            <span class="chip">Positive reinforcement</span>
+            <span id="statusText" class="status">Ready</span>
+          </div>
+
+          <div id="timer" class="timer">01:00:00</div>
+
+          <div class="progress-track" aria-label="Session progress">
+            <span id="progressFill" class="progress-fill"></span>
+          </div>
+
+          <div class="meta-row">
+            <span id="timeLabel">60:00 remaining</span>
+            <span id="sessionPercent">0%</span>
+          </div>
+        </section>
+
+        <section class="affirmation-card card">
+          <div class="label-row">
+            <span class="chip accent">Current affirmation</span>
+            <span id="momentTag" class="moment-tag">Start</span>
+          </div>
+
+          <div class="affirmation-controls" aria-label="Affirmation modes">
+            <button class="mood-button active" data-mood="calm" type="button">Calm</button>
+            <button class="mood-button" data-mood="confidence" type="button">Confidence</button>
+            <button class="mood-button" data-mood="joy" type="button">Joy</button>
+            <button class="mood-button" data-mood="focus" type="button">Focus</button>
+            <button id="newAffirmationBtn" class="secondary-button mini-button" type="button">New affirmation</button>
+          </div>
+
+          <h2 id="affirmationTitle">You are already enough.</h2>
+          <p id="affirmationText">
+            You do not need to be perfect to be worthy of care, rest, and joy.
+          </p>
+        </section>
+
+        <section class="milestones" aria-label="Choose a session section">
+          <article class="milestone-card card">
+            <button class="section-select" data-section="0" type="button" aria-pressed="false">
+            <span>05 min</span>
+            <strong>Steady beginning</strong>
+            <p>This is your settling-in moment. Let your breath slow down and let the first minutes feel safe and earned.</p>
+              <em>Choose section</em>
+            </button>
+          </article>
+
+          <article class="milestone-card card">
+            <button class="section-select" data-section="1" type="button" aria-pressed="false">
+            <span>15 min</span>
+            <strong>Momentum</strong>
+            <p>This block is about visible progress. Notice what has already shifted inside you, even if it feels small.</p>
+              <em>Choose section</em>
+            </button>
+          </article>
+
+          <article class="milestone-card card">
+            <button class="section-select" data-section="2" type="button" aria-pressed="false">
+            <span>30 min</span>
+            <strong>Trust yourself</strong>
+            <p>This section is for trust. You are not behind. You are building steady confidence, one honest choice at a time.</p>
+              <em>Choose section</em>
+            </button>
+          </article>
+
+          <article class="milestone-card card">
+            <button class="section-select" data-section="3" type="button" aria-pressed="false">
+            <span>45 min</span>
+            <strong>Strength</strong>
+            <p>This is your strength window. Acknowledge the effort you have already made and let yourself feel proud.</p>
+              <em>Choose section</em>
+            </button>
+          </article>
+
+          <article class="milestone-card card">
+            <button class="section-select" data-section="4" type="button" aria-pressed="false">
+            <span>60 min</span>
+            <strong>Completion</strong>
+            <p>This final block is about recognition. You gave yourself an hour of care, patience, and gentleness.</p>
+              <em>Choose section</em>
+            </button>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
