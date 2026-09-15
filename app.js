@@ -114,6 +114,7 @@ let selectedMood = 'calm';
 let selectedSection = null;
 const moodIndexes = {};
 let customAffirmation = null;
+let lastSpokenAffirmationKey = '';
 let ambientAudioContext = null;
 let ambientNoiseSource = null;
 let ambientFilter = null;
@@ -173,10 +174,13 @@ function getActiveAffirmation() {
   return customAffirmation || pickMoodAffirmation(selectedMood);
 }
 
-function speakAffirmation() {
+function speakAffirmation(force = false) {
   if (!window.speechSynthesis || !voiceEnabled) return;
 
   const affirmation = personalizeAffirmation(getActiveAffirmation());
+  const affirmationKey = `${affirmation.title}|${affirmation.text}`;
+  if (!force && affirmationKey === lastSpokenAffirmationKey) return;
+
   const message = `${affirmation.title}. ${affirmation.text}`;
   const utterance = new SpeechSynthesisUtterance(message);
   utterance.rate = 0.9;
@@ -193,6 +197,7 @@ function speakAffirmation() {
 
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(utterance);
+  lastSpokenAffirmationKey = affirmationKey;
 }
 
 function toggleVoice() {
@@ -204,7 +209,7 @@ function toggleVoice() {
     return;
   }
 
-  speakAffirmation();
+  speakAffirmation(true);
 }
 
 function ensureAmbientAudio() {
@@ -293,14 +298,7 @@ function formatTime(total) {
 }
 
 function getAffirmationForElapsed(elapsed) {
-  const elapsedMinutes = Math.floor(elapsed / 60);
-
-  if (elapsedMinutes < 5) return affirmations.start[0];
-  if (elapsedMinutes < 15) return affirmations.five[0];
-  if (elapsedMinutes < 30) return affirmations.fifteen[0];
-  if (elapsedMinutes < 45) return affirmations.thirty[0];
-  if (elapsedMinutes < 60) return affirmations.fortyFive[0];
-  return affirmations.sixty[0];
+  return getMilestoneForElapsed(elapsed);
 }
 
 function pickMoodAffirmation(mood = selectedMood) {
@@ -413,12 +411,7 @@ function tick() {
     return;
   }
 
-  const elapsedSeconds = totalSeconds - remainingSeconds;
-  const milestoneThresholds = [300, 900, 1800, 2700];
-
-  if (elapsedSeconds === 0 || milestoneThresholds.includes(elapsedSeconds)) {
-    speakAffirmation();
-  }
+  speakAffirmation();
 }
 
 function startSession() {
@@ -433,7 +426,7 @@ function startSession() {
   customAffirmation = null;
   updateSectionButtons();
 
-  speakAffirmation();
+  speakAffirmation(true);
   timerId = setInterval(tick, 1000);
 }
 
@@ -448,6 +441,7 @@ function resetSession() {
   startBtn.disabled = false;
   selectedSection = null;
   customAffirmation = pickMoodAffirmation(selectedMood);
+  lastSpokenAffirmationKey = '';
   window.speechSynthesis?.cancel();
   updateSectionButtons();
   render();
