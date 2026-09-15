@@ -115,7 +115,10 @@ let selectedSection = null;
 const moodIndexes = {};
 let customAffirmation = null;
 let ambientAudioContext = null;
-let ambientOscillator = null;
+let ambientNoiseSource = null;
+let ambientFilter = null;
+let ambientFilterLfo = null;
+let ambientFilterDepth = null;
 let ambientGain = null;
 
 function getUserName() {
@@ -176,12 +179,16 @@ function speakAffirmation() {
   const affirmation = personalizeAffirmation(getActiveAffirmation());
   const message = `${affirmation.title}. ${affirmation.text}`;
   const utterance = new SpeechSynthesisUtterance(message);
-  utterance.rate = 0.96;
-  utterance.pitch = 1.2;
-  utterance.volume = 0.9;
+  utterance.rate = 0.9;
+  utterance.pitch = 0.86;
+  utterance.volume = 0.95;
 
   const voices = window.speechSynthesis.getVoices();
-  const preferredVoice = voices.find(voice => /en/i.test(voice.lang)) || voices[0];
+  const englishVoices = voices.filter(voice => /en/i.test(voice.lang));
+  const maleVoice = englishVoices.find(voice =>
+    /david|daniel|george|guy|james|male|mark|microsoft guy|google uk english male/i.test(voice.name)
+  );
+  const preferredVoice = maleVoice || englishVoices[0] || voices[0];
   if (preferredVoice) utterance.voice = preferredVoice;
 
   window.speechSynthesis.cancel();
@@ -206,16 +213,41 @@ function ensureAmbientAudio() {
 
   if (!ambientAudioContext) {
     ambientAudioContext = new AudioContextClass();
-    ambientOscillator = ambientAudioContext.createOscillator();
-    ambientOscillator.type = 'sine';
-    ambientOscillator.frequency.value = 174;
+    const noiseBuffer = ambientAudioContext.createBuffer(
+      1,
+      ambientAudioContext.sampleRate * 4,
+      ambientAudioContext.sampleRate
+    );
+    const noiseData = noiseBuffer.getChannelData(0);
+    for (let index = 0; index < noiseData.length; index += 1) {
+      noiseData[index] = Math.random() * 2 - 1;
+    }
+
+    ambientNoiseSource = ambientAudioContext.createBufferSource();
+    ambientNoiseSource.buffer = noiseBuffer;
+    ambientNoiseSource.loop = true;
+
+    ambientFilter = ambientAudioContext.createBiquadFilter();
+    ambientFilter.type = 'lowpass';
+    ambientFilter.frequency.value = 650;
+    ambientFilter.Q.value = 0.7;
+
+    ambientFilterLfo = ambientAudioContext.createOscillator();
+    ambientFilterLfo.type = 'sine';
+    ambientFilterLfo.frequency.value = 0.07;
+    ambientFilterDepth = ambientAudioContext.createGain();
+    ambientFilterDepth.gain.value = 350;
+    ambientFilterLfo.connect(ambientFilterDepth);
+    ambientFilterDepth.connect(ambientFilter.frequency);
 
     ambientGain = ambientAudioContext.createGain();
     ambientGain.gain.value = 0.0001;
 
-    ambientOscillator.connect(ambientGain);
+    ambientNoiseSource.connect(ambientFilter);
+    ambientFilter.connect(ambientGain);
     ambientGain.connect(ambientAudioContext.destination);
-    ambientOscillator.start();
+    ambientNoiseSource.start();
+    ambientFilterLfo.start();
   }
 
   if (ambientAudioContext.state === 'suspended') {
